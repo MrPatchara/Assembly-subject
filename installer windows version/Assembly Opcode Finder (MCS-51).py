@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 import pandas as pd
-from PIL import Image, ImageTk  # Import the necessary parts of Pillow
+import os
+from PIL import Image, ImageTk
+import platform
 
 # Load the Excel data
 file_path = 'Book1.xlsx'  # ใส่ path ของไฟล์ Excel
@@ -43,9 +45,64 @@ def reset():
     entry_mnemonic.delete(0, tk.END)
     listbox_results.delete(0, tk.END)
 
+# Function to open Excel file in Microsoft Excel
+def open_excel():
+    try:
+        if platform.system() == 'Windows':  # On Windows
+            os.startfile(file_path)
+        elif platform.system() == 'Darwin':  # On macOS
+            os.system(f"open {file_path}")
+        else:  # On Linux
+            os.system(f"xdg-open {file_path}")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to open file: {e}")
+
+# Function to show developer information
+def show_developer_info():
+    # Create a new top-level window with the same theme as the main program
+    developer_window = tk.Toplevel(root)
+    developer_window.title("Contact Developer")
+    developer_window.configure(bg=bg_color)
+    # adjust size of the window
+    developer_window.geometry("290x270")
+    # add icon of the window
+    developer_window.iconbitmap("dev.ico")
+
+    # Label for developer information
+    developer_info = """
+   MR. Patchara Al-umaree
+   Patcharaalumaree@gmail.com
+   https://github.com/MrPatchara
+    """
+    
+    # add picture of developer 
+    try:
+        ic_image = Image.open("pic.png")  # ปรับเป็น path ของไฟล์รูปที่คุณต้องการ
+        ic_image = ic_image.resize((90, 90))  # ปรับขนาดของรูปภาพตามต้องการ
+        ic_image_tk = ImageTk.PhotoImage(ic_image)  # แปลงเป็นรูปแบบที่ Tkinter รองรับ
+        label_icon = tk.Label(developer_window, image=ic_image_tk, bg=bg_color)
+        label_icon.image = ic_image_tk  # เก็บ reference ของรูปภาพเพื่อไม่ให้ถูกลบ
+        label_icon.pack(pady=10) 
+    except Exception as e:
+        print(f"Error loading image: {e}")
+
+    label_info = tk.Label(developer_window, text=developer_info, bg=bg_color, fg=fg_color, font=font_style)
+    label_info.pack(padx=10, pady=10) 
+
+    # adjust size text
+    label_info.config(font=("Courier", 10, "bold"))
+
+    # Close button for the developer info window
+    btn_close = tk.Button(developer_window, text="Close", command=developer_window.destroy, bg=btn_color, fg=fg_color, font=font_style)
+    btn_close.pack(pady=10)
+
 # Create the GUI window
 root = tk.Tk()
-root.title("Assembly Mnemonic Finder")
+root.title("Assembly Opcode Finder (MCS-51)")
+# adjust size of the window
+root.geometry("490x710")
+# add icon of the window
+root.iconbitmap("cpu.ico")
 
 # Vintage mode colors
 bg_color = "#2b2b2b"  # Warm dark brown
@@ -59,13 +116,29 @@ root.configure(bg=bg_color)
 # Add IC 8051 image as an icon in the top of the window using Pillow
 try:
     ic_image = Image.open("ic_8051.png")  # ปรับเป็น path ของไฟล์รูปที่คุณต้องการ
-    ic_image = ic_image.resize((150, 150))  # ปรับขนาดของรูปภาพตามต้องการ
+    ic_image = ic_image.resize((160, 160))  # ปรับขนาดของรูปภาพตามต้องการ
     ic_image_tk = ImageTk.PhotoImage(ic_image)  # แปลงเป็นรูปแบบที่ Tkinter รองรับ
     label_icon = tk.Label(root, image=ic_image_tk, bg=bg_color)
     label_icon.image = ic_image_tk  # เก็บ reference ของรูปภาพเพื่อไม่ให้ถูกลบ
     label_icon.pack(pady=10)
 except Exception as e:
     print(f"Error loading image: {e}")
+
+# Create the menu bar
+menu_bar = tk.Menu(root)
+
+# File menu
+file_menu = tk.Menu(menu_bar, tearoff=0)
+file_menu.add_command(label="Open Excel File", command=open_excel)
+menu_bar.add_cascade(label="Settings", menu=file_menu)
+
+# Help menu
+help_menu = tk.Menu(menu_bar, tearoff=0)
+help_menu.add_command(label="Contact Developer", command=show_developer_info)
+menu_bar.add_cascade(label="Help", menu=help_menu)
+
+# Attach the menu to the root window
+root.config(menu=menu_bar)
 
 # Mnemonic input label and entry
 label_mnemonic = tk.Label(root, text="Enter Mnemonic:", bg=bg_color, fg=fg_color, font=font_style)
