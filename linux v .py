@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from PIL import Image, ImageTk
 import platform
+import subprocess
 
 # Load the Excel data
 file_path = 'Book1.xlsx'  # ใส่ path ของไฟล์ Excel
@@ -74,7 +75,6 @@ def show_developer_info():
     developer_window.configure(bg=bg_color)
     # adjust size of the window
     developer_window.geometry("290x270")
- 
 
     # Label for developer information
     developer_info = """
@@ -134,15 +134,50 @@ except Exception as e:
 # Create the menu bar
 menu_bar = tk.Menu(root)
 
+
+# Create a 'Menu' dropdown
+menu = tk.Menu(menu_bar, tearoff=0)
+menu_bar.add_cascade(label="Menu", menu=menu)
+
+# Function to run edsim51di.jar
+def run_edsim51di():
+    jar_file = "edsim51di.jar"  # Path to the JAR file
+    try:
+        # Start the JAR file as a background process
+        subprocess.Popen(["java", "-jar", jar_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        messagebox.showinfo("Success", f"Started {jar_file} successfully.")
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"Cannot find {jar_file}. Ensure it is in the same directory.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred:\n{e}")
+
+
+
 # File menu
 file_menu = tk.Menu(menu_bar, tearoff=0)
 file_menu.add_command(label="Open Excel File", command=open_excel)
 menu_bar.add_cascade(label="Settings", menu=file_menu)
 
+# Function to install Java
+def install_java():
+    installer_file = "java-installer-windows-x64.exe"  # Path to the installer file
+    try:
+        # Run the installer as a separate process
+        subprocess.Popen([installer_file], shell=True)
+        messagebox.showinfo("Install Java", f"Running {installer_file}. Follow the instructions to install Java.")
+    except FileNotFoundError:
+        messagebox.showerror("Error", f"Cannot find {installer_file}. Ensure it is in the same directory.")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred:\n{e}")
+        
 # Help menu
 help_menu = tk.Menu(menu_bar, tearoff=0)
-help_menu.add_command(label="Contact Developer", command=show_developer_info)
 menu_bar.add_cascade(label="Help", menu=help_menu)
+
+# Add an option to run the jar file
+menu.add_command(label="Run 8051 Simulator", command=run_edsim51di)
+help_menu.add_command(label="Install Java windows x64", command=install_java)
+help_menu.add_command(label="Contact Developer", command=show_developer_info)
 
 # Attach the menu to the root window
 root.config(menu=menu_bar)
