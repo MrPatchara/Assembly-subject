@@ -74,7 +74,8 @@ def show_developer_info():
     developer_window.configure(bg=bg_color)
     # adjust size of the window
     developer_window.geometry("290x270")
- 
+    # add icon of the window
+    developer_window.iconbitmap("dev.ico")
 
     # Label for developer information
     developer_info = """
@@ -109,7 +110,8 @@ root = tk.Tk()
 root.title("Assembly Opcode Finder (MCS-51)")
 # adjust size of the window
 root.geometry("490x710")
-
+# add icon of the window
+root.iconbitmap("cpu.ico")
 
 # Vintage mode colors
 bg_color = "#2b2b2b"  # Warm dark brown
